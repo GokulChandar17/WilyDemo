@@ -1,63 +1,58 @@
-# Diffie-Hellman Code
+import random
 
+def is_prime(n, k=5):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0:
+        return False
 
-def prime_checker(p):
-	# Checks If the number entered is a Prime Number or not
-	if p < 1:
-		return -1
-	elif p > 1:
-		if p == 2:
-			return 1
-		for i in range(2, p):
-			if p % i == 0:
-				return -1
-			return 1
+    # Miller-Rabin primality test
+    def is_probably_prime(n, k):
+        if n <= 4:
+            return True
+        for _ in range(k):
+            a = random.randint(2, n - 2)
+            x = pow(a, n - 1, n)
+            if x != 1:
+                return False
+        return True
 
+    return is_probably_prime(n, k)
 
-def primitive_check(g, p, L):
-	# Checks If The Entered Number Is A Primitive Root Or Not
-	for i in range(1, p):
-		L.append(pow(g, i) % p)
-	for i in range(1, p):
-		if L.count(i) > 1:
-			L.clear()
-			return -1
-		return 1
+def find_primitive_root(p):
+    if p == 2:
+        return 1
+    for g in range(2, p):
+        if pow(g, p - 1, p) == 1:
+            return g
 
+while True:
+    P = int(input("Enter a prime number (P): "))
+    if not is_prime(P):
+        print("P is not a prime number. Please enter a prime number.")
+    else:
+        break
 
-l = []
-while 1:
-	P = int(input("Enter P : "))
-	if prime_checker(P) == -1:
-		print("Number Is Not Prime, Please Enter Again!")
-		continue
-	break
+G = find_primitive_root(P)
+print(f"The primitive root of {P} is {G}")
 
-while 1:
-	G = int(input(f"Enter The Primitive Root Of {P} : "))
-	if primitive_check(G, P, l) == -1:
-		print(f"Number Is Not A Primitive Root Of {P}, Please Try Again!")
-		continue
-	break
+x1 = int(input("Enter the private key of User 1: "))
+x2 = int(input("Enter the private key of User 2: ")
 
-# Private Keys
-x1, x2 = int(input("Enter The Private Key Of User 1 : ")), int(
-	input("Enter The Private Key Of User 2 : "))
-while 1:
-	if x1 >= P or x2 >= P:
-		print(f"Private Key Of Both The Users Should Be Less Than {P}!")
-		continue
-	break
-
-# Calculate Public Keys
-y1, y2 = pow(G, x1) % P, pow(G, x2) % P
-
-# Generate Secret Keys
-k1, k2 = pow(y2, x1) % P, pow(y1, x2) % P
-
-print(f"\nSecret Key For User 1 Is {k1}\nSecret Key For User 2 Is {k2}\n")
-
-if k1 == k2:
-	print("Keys Have Been Exchanged Successfully")
+if x1 >= P or x2 >= P:
+    print(f"Private keys should be less than {P}!")
 else:
-	print("Keys Have Not Been Exchanged Successfully")
+    y1 = pow(G, x1, P)
+    y2 = pow(G, x2, P)
+    
+    k1 = pow(y2, x1, P)
+    k2 = pow(y1, x2, P)
+    
+    if k1 == k2:
+        print(f"\nSecret Key for User 1 is {k1}")
+        print(f"Secret Key for User 2 is {k2}")
+        print("Keys have been exchanged successfully.")
+    else:
+        print("Keys have not been exchanged successfully.")
