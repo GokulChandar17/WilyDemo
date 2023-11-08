@@ -1,58 +1,57 @@
 import random
 
-def is_prime(n, k=5):
-    if n <= 1:
+def is_prime(num, k=5):
+    if num <= 1:
         return False
-    if n <= 3:
+    if num <= 3:
         return True
-    if n % 2 == 0:
+    if num % 2 == 0:
         return False
 
-    # Miller-Rabin primality test
-    def is_probably_prime(n, k):
-        if n <= 4:
+    def is_probably_prime(num, k):
+        if num <= 4:
             return True
         for _ in range(k):
-            a = random.randint(2, n - 2)
-            x = pow(a, n - 1, n)
+            a = random.randint(2, num - 2)
+            x = pow(a, num - 1, num)
             if x != 1:
                 return False
         return True
 
-    return is_probably_prime(n, k)
+    return is_probably_prime(num, k)
 
-def find_primitive_root(p):
-    if p == 2:
+def find_primitive_root(prime):
+    if prime == 2:
         return 1
-    for g in range(2, p):
-        if pow(g, p - 1, p) == 1:
-            return g
+    for primitive in range(2, prime):
+        if pow(primitive, prime - 1, prime) == 1:
+            return primitive
 
 while True:
-    P = int(input("Enter a prime number (P): "))
-    if not is_prime(P):
+    prime_number = int(input("Enter a prime number (P): "))
+    if not is_prime(prime_number):
         print("P is not a prime number. Please enter a prime number.")
     else:
         break
 
-G = find_primitive_root(P)
-print(f"The primitive root of {P} is {G}")
+primitive_root = find_primitive_root(prime_number)
+print(f"The primitive root of {prime_number} is {primitive_root}")
 
-x1 = int(input("Enter the private key of User 1: "))
-x2 = int(input("Enter the private key of User 2: ")
+user1_private_key = int(input("Enter the private key of User 1: "))
+user2_private_key = int(input("Enter the private key of User 2: "))
 
-if x1 >= P or x2 >= P:
-    print(f"Private keys should be less than {P}!")
+if user1_private_key >= prime_number or user2_private_key >= prime_number:
+    print(f"Private keys should be less than {prime_number}!")
 else:
-    y1 = pow(G, x1, P)
-    y2 = pow(G, x2, P)
+    user1_public_key = pow(primitive_root, user1_private_key, prime_number)
+    user2_public_key = pow(primitive_root, user2_private_key, prime_number)
     
-    k1 = pow(y2, x1, P)
-    k2 = pow(y1, x2, P)
+    shared_key1 = pow(user2_public_key, user1_private_key, prime_number)
+    shared_key2 = pow(user1_public_key, user2_private_key, prime_number)
     
-    if k1 == k2:
-        print(f"\nSecret Key for User 1 is {k1}")
-        print(f"Secret Key for User 2 is {k2}")
+    if shared_key1 == shared_key2:
+        print(f"\nShared Key for User 1 is {shared_key1}")
+        print(f"Shared Key for User 2 is {shared_key2}")
         print("Keys have been exchanged successfully.")
     else:
         print("Keys have not been exchanged successfully.")
