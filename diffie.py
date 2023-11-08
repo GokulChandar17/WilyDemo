@@ -1,4 +1,6 @@
 import random
+import sys
+import os
 
 def is_prime(num, k=5):
     if num <= 1:
